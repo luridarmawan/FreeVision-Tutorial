@@ -1,9 +1,9 @@
 //image image.png
 (*
-Ein Editor wird erst brauchbar, wen Dateifunktionen dazu kommen, zB. öffnen und speichern.
-Das Öffnen ist ähnlich von wie ein leerses Fenster erzeugen.
-Einziger Unterschied, man gibt einen Dateinamen mit, welcher mit einem FileDialog ermittelt wird.
-Für das einfache speichern, muss man nicht viel machen. Man muss nur das Event <b>cmSave</b> aufrufen, zB. über das Menü.
+An editor only becomes useful when file functions are added, such as opening and saving.
+Opening is similar to creating an empty window.
+The only difference is that you provide a filename, which is obtained via a FileDialog.
+For simple saving, you don't need to do much. You just need to call the <b>cmSave</b> event, e.g. via the menu.
 *)
 //lineal
 program Project1;
@@ -25,7 +25,7 @@ const
 type
 
 (*
-Hier ist noch OpenWindows und SaveAll dazu gekommen.
+OpenWindows and SaveAll have been added here.
 *)
 //code+
   TMyApp = object(TApplication)
@@ -45,13 +45,13 @@ Hier ist noch OpenWindows und SaveAll dazu gekommen.
 //code-
 
 (*
-Der <b>Speichern unter</b>-Dialog ist schon fest verbaut, aber leider in Englisch.
-Daher wird diese Funktion auf eine eigene Routine umgeleitet.
-Auch habe ich die Maske <b>*.*</b> durch <b>*.txt</b> ersetzt.
-Für die restlichen Diloage, werden die original Routinen verwendet, dies geschieht mit <b>StdEditorDialog(...</b>.
-Die Deklaration von <b>MyApp</b> ist schon hier oben, weil sie hier schon gebraucht wird.
+The <b>Save as</b> dialog is already built-in, but unfortunately in English.
+Therefore this function is redirected to a custom routine.
+I have also replaced the mask <b>*.*</b> with <b>*.txt</b>.
+For the remaining dialogs, the original routines are used, this is done with <b>StdEditorDialog(...)</b>.
+The declaration of <b>MyApp</b> is already here at the top, because it is needed here.
 
-Bei MyApp.Init werden noch die neuen Standard-Dialoge zugeordnet.
+In MyApp.Init, the new standard dialogs are also assigned.
 *)
 //code+
 var
@@ -60,20 +60,20 @@ var
   function MyStdEditorDialog(Dialog: Int16; Info: Pointer): Word;
   begin
     case Dialog of
-      edSaveAs: begin                 // Neuer Dialog in Deutsch.
-        Result := MyApp.ExecuteDialog(New(PFileDialog, Init('*.txt', 'Datei speichern unter', '~D~atei-Name', fdOkButton, 101)), Info);
+      edSaveAs: begin                 // Custom save dialog.
+        MyStdEditorDialog := MyApp.ExecuteDialog(New(PFileDialog, Init('*.txt', 'Save file as', '~F~ilename', fdOkButton, 101)), Info);
       end;
     else
-      StdEditorDialog(Dialog, Info);  // Original Dialoge aufrufen.
+      StdEditorDialog(Dialog, Info);  // Call original dialogs.
     end;
   end;
 
   constructor TMyApp.Init;
   begin
     inherited Init;
-    EditorDialog := @MyStdEditorDialog; // Die neue Dialog-Routine.
+    EditorDialog := @MyStdEditorDialog; // The new dialog routine.
     DisableCommands([cmSave, cmSaveAs, cmCut, cmCopy, cmPaste, cmClear, cmUndo]);
-    NewWindows('');                     // Leeres Fenster erzeugen.
+    NewWindows('');                     // Create empty window.
   end;
 //code-
 
@@ -85,14 +85,14 @@ var
     R.A.Y := R.B.Y - 1;
 
     StatusLine := New(PStatusLine, Init(R, NewStatusDef(0, $FFFF,
-      NewStatusKey('~Alt+X~ Programm beenden', kbAltX, cmQuit,
+      NewStatusKey('~Alt+X~ Exit program', kbAltX, cmQuit,
       NewStatusKey('~F10~ Menu', kbF10, cmMenu,
-      NewStatusKey('~F2~ Speichern', kbF2, cmMenu,
-      NewStatusKey('~F1~ Hilfe', kbF1, cmHelp, nil)))), nil)));
+      NewStatusKey('~F2~ Save', kbF2, cmMenu,
+      NewStatusKey('~F1~ Help', kbF1, cmHelp, nil)))), nil)));
   end;
 
 (*
-Im Menü sind die neuen Datei-Funktionen dazugekommen.
+The new file functions have been added to the menu.
 *)
 //code+
   procedure TMyApp.InitMenuBar;
@@ -103,38 +103,38 @@ Im Menü sind die neuen Datei-Funktionen dazugekommen.
     R.B.Y := R.A.Y + 1;
 
     MenuBar := New(PMenuBar, Init(R, NewMenu(
-      NewSubMenu('~D~atei', hcNoContext, NewMenu(
-        NewItem('~N~eu', 'F4', kbF4, cmNewWin, hcNoContext,
-        NewItem('~O~effnen...', 'F3', kbF3, cmOpen, hcNoContext,
-        NewItem('~S~peichern', 'F2', kbF2, cmSave, hcNoContext,
-        NewItem('Speichern ~u~nter...', '', kbNoKey, cmSaveAs, hcNoContext,
-        NewItem('~A~lle speichern', '', kbNoKey, cmSaveAll, hcNoContext,
+      NewSubMenu('~F~ile', hcNoContext, NewMenu(
+        NewItem('~N~ew', 'F4', kbF4, cmNewWin, hcNoContext,
+        NewItem('~O~pen...', 'F3', kbF3, cmOpen, hcNoContext,
+        NewItem('~S~ave', 'F2', kbF2, cmSave, hcNoContext,
+        NewItem('Save ~a~s...', '', kbNoKey, cmSaveAs, hcNoContext,
+        NewItem('Save ~a~ll', '', kbNoKey, cmSaveAll, hcNoContext,
         NewLine(
-        NewItem('~B~eenden', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
-      NewSubMenu('~F~enster', hcNoContext, NewMenu(
-        NewItem('~N~ebeneinander', '', kbNoKey, cmTile, hcNoContext,
-        NewItem(#154'ber~l~append', '', kbNoKey, cmCascade, hcNoContext,
-        NewItem('~A~lle schliessen', '', kbNoKey, cmCloseAll, hcNoContext,
-        NewItem('Anzeige ~e~rneuern', '', kbNoKey, cmRefresh, hcNoContext,
+        NewItem('~E~xit', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
+      NewSubMenu('~W~indow', hcNoContext, NewMenu(
+        NewItem('~T~ile', '', kbNoKey, cmTile, hcNoContext,
+        NewItem('~C~ascade', '', kbNoKey, cmCascade, hcNoContext,
+        NewItem('~C~lose all', '', kbNoKey, cmCloseAll, hcNoContext,
+        NewItem('~R~efresh', '', kbNoKey, cmRefresh, hcNoContext,
         NewLine(
-        NewItem('Gr'#148'sse/~P~osition', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
-        NewItem('Ver~g~'#148'ssern', 'F5', kbF5, cmZoom, hcNoContext,
-        NewItem('~N~'#132'chstes', 'F6', kbF6, cmNext, hcNoContext,
-        NewItem('~V~orheriges', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
+        NewItem('~S~ize/~M~ove', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
+        NewItem('~Z~oom', 'F5', kbF5, cmZoom, hcNoContext,
+        NewItem('~N~ext', 'F6', kbF6, cmNext, hcNoContext,
+        NewItem('~P~revious', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
         NewLine(
-        NewItem('~S~chliessen', 'Alt+F3', kbAltF3, cmClose, hcNoContext, Nil)))))))))))), nil)))));
+        NewItem('~C~lose', 'Alt+F3', kbAltF3, cmClose, hcNoContext, Nil)))))))))))), nil)))));
 
   end;
 //code-
 
   procedure TMyApp.OutOfMemory;
   begin
-    MessageBox('Zu wenig Arbeitsspeicher !', nil, mfError + mfOkButton);
+    MessageBox('Not enough memory !', nil, mfError + mfOkButton);
   end;
 
 (*
-Einfügen eines Editorfensters.
-Wen der Dateiname '' ist, wird einfach ein leeres Fenster erzeugt.
+Insert an editor window.
+If the filename is '', a simple empty window is created.
 *)
 //code+
   procedure TMyApp.NewWindows(FileName: ShortString);
@@ -142,7 +142,7 @@ Wen der Dateiname '' ist, wird einfach ein leeres Fenster erzeugt.
     Win: PEditWindow;
     R: TRect;
   const
-    WinCounter: integer = 0;      // Zählt Fenster
+    WinCounter: integer = 0;      // Window counter
   begin
     R.Assign(0, 0, 60, 20);
     Inc(WinCounter);
@@ -150,15 +150,15 @@ Wen der Dateiname '' ist, wird einfach ein leeres Fenster erzeugt.
 
     if ValidView(Win) <> nil then begin
       Desktop^.Insert(Win);
-    end else begin                // Fügt das Fenster ein.
+    end else begin                // Insert the window.
       Dec(WinCounter);
     end;
   end;
 //code-
 (*
-Eine Datei öffnen und dies in ein Edit-Fenster laden.
-Dabei wird ein <b>FileDialog</b> aufgerufen, in dem man eine Datei auswählen kann.
-Um das laden der Datei in das Editor-Fenster  muss man sich nicht kümmeren, dies geschieht automatisch.
+Open a file and load it into an edit window.
+A <b>FileDialog</b> is called in which you can select a file.
+You don't need to worry about loading the file into the editor window, this is done automatically.
 *)
 //code+
   procedure TMyApp.OpenWindows;
@@ -167,25 +167,25 @@ Um das laden der Datei in das Editor-Fenster  muss man sich nicht kümmeren, die
     FileName: ShortString;
   begin
     FileName := '*.*';
-    New(FileDialog, Init(FileName, 'Datei '#148'ffnen', '~D~ateiname', fdOpenButton, 1));
+    New(FileDialog, Init(FileName, 'Open file', '~F~ilename', fdOpenButton, 1));
     if ExecuteDialog(FileDialog, @FileName) <> cmCancel then begin
-      NewWindows(FileName); // Neues Fenster mit der ausgewählten Datei.
+      NewWindows(FileName); // New window with selected file.
     end;
   end;
 //code-
 (*
-Alle Dateien speichern, geschieht auf fast die gleiche Weise wie das alle schliessen.
+Save all files, done almost the same way as closing all.
 *)
 //code+
   procedure TMyApp.SaveAll;
 
     procedure SendSave(P: PView);
     begin
-      Message(P, evCommand, cmSave, nil); // Das Kommando speicherm mitgeben.
+      Message(P, evCommand, cmSave, nil); // Send save command.
     end;
 
   begin
-    Desktop^.ForEach(@SendSave);          // Auf alle Fenster anwenden.
+    Desktop^.ForEach(@SendSave);          // Apply to all windows.
   end;
 //code-
 
@@ -201,8 +201,8 @@ Alle Dateien speichern, geschieht auf fast die gleiche Weise wie das alle schlie
   end;
 
 (*
-Die verschiednen Events abfangen und abarbeiten.
-Um <b>cmSave</b> und <b>cmSaveAs</b> muss man sich nicht kümmern, das erledigt <b>PEditWindow</b> automatisch für einem.
+Catch and process the various events.
+You don't need to handle <b>cmSave</b> and <b>cmSaveAs</b>, <b>PEditWindow</b> does this automatically for you.
 *)
 //code+
   procedure TMyApp.HandleEvent(var Event: TEvent);
@@ -212,19 +212,19 @@ Um <b>cmSave</b> und <b>cmSaveAs</b> muss man sich nicht kümmern, das erledigt 
     if Event.What = evCommand then begin
       case Event.Command of
         cmNewWin: begin
-          NewWindows('');   // Leeres Fenster erzeugen.
+          NewWindows('');   // Create empty window.
         end;
         cmOpen: begin
-          OpenWindows;      // Datei öffnen.
+          OpenWindows;      // Open file.
         end;
         cmSaveAll: begin
-          SaveAll;          // Alle speichern.
+          SaveAll;          // Save all.
         end;
         cmCloseAll:begin
-          CloseAll;         // Schliesst alle Fenster.
+          CloseAll;         // Closes all windows.
         end;
         cmRefresh: begin
-          ReDraw;           // Anwendung neu zeichnen.
+          ReDraw;           // Redraw application.
         end;
         else begin
           Exit;
@@ -235,7 +235,7 @@ Um <b>cmSave</b> und <b>cmSaveAs</b> muss man sich nicht kümmern, das erledigt 
 //code-
 
 begin
-  MyApp.Init;   // Inizialisieren
-  MyApp.Run;    // Abarbeiten
-  MyApp.Done;   // Freigeben
+  MyApp.Init;   // Initialize
+  MyApp.Run;    // Run
+  MyApp.Done;   // Release
 end.

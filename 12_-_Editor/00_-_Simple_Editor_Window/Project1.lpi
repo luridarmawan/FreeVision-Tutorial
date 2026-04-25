@@ -6,6 +6,7 @@
       <Flags>
         <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
         <CompatibilityMode Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
@@ -49,6 +50,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="C:/lazarus/fpc/3.2.2/source/packages/fv/src/;C:/lazarus/fpc/3.2.2/source/packages/rtl-console/src/win/;C:/lazarus/fpc/3.2.2/source/packages/rtl-console/src/inc/"/>
       <UnitOutputDirectory Value="/tmp"/>
     </SearchPaths>
     <Linking>

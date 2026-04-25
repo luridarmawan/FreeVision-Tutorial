@@ -56,7 +56,7 @@ New replace dialog, I took this from the FPC sources and translated it to German
     R: TRect;
   begin
     R.Assign(0, 0, 38, 12);
-    D := New(PDialog, Init(R, 'Suchen'));
+    D := New(PDialog, Init(R, 'Find'));
     with D^ do begin
       Options := Options or ofCentered;
 
@@ -65,14 +65,14 @@ New replace dialog, I took this from the FPC sources and translated it to German
       Control^.HelpCtx := hcDFindText;
       Insert(Control);
       R.Assign(2, 2, 20, 3);
-      Insert(New(PLabel, Init(R, 'Zu ~s~uchenden Text', Control)));
+      Insert(New(PLabel, Init(R, '~F~ind text', Control)));
       R.Assign(32, 3, 35, 4);
       Insert(New(PHistory, Init(R, PInputLine(Control), 10)));
 
       R.Assign(3, 5, 35, 7);
       Control := New(PCheckBoxes, Init(R,
-        NewSItem('~G~ross- und Kleinschreibung',
-        NewSItem('~N~ur ganze W'#148'rter', nil))));
+        NewSItem('~C~ase sensitive',
+        NewSItem('~W~hole words only', nil))));
       Control^.HelpCtx := hcCCaseSensitive;
       Insert(Control);
 
@@ -100,7 +100,7 @@ New replace dialog, I took this from the FPC sources and translated it to German
     R: TRect;
   begin
     R.Assign(0, 0, 40, 16);
-    Dialog := New(PDialog, Init(R, 'Ersetzen'));
+    Dialog := New(PDialog, Init(R, 'Replace'));
     with Dialog^ do begin
       Options := Options or ofCentered;
 
@@ -109,7 +109,7 @@ New replace dialog, I took this from the FPC sources and translated it to German
       Control^.HelpCtx := hcDFindText;
       Insert(Control);
       R.Assign(2, 2, 20, 3);
-      Insert(New(PLabel, Init(R, 'Zu ~s~uchenden Text', Control)));
+      Insert(New(PLabel, Init(R, '~F~ind text', Control)));
       R.Assign(34, 3, 37, 4);
       Insert(New(PHistory, Init(R, PInputLine(Control), 10)));
 
@@ -118,16 +118,16 @@ New replace dialog, I took this from the FPC sources and translated it to German
       Control^.HelpCtx := hcDReplaceText;
       Insert(Control);
       R.Assign(2, 5, 20, 6);
-      Insert(New(PLabel, Init(R, 'Neuer ~T~ext', Control)));
+      Insert(New(PLabel, Init(R, '~R~eplace with', Control)));
       R.Assign(34, 6, 37, 7);
       Insert(New(PHistory, Init(R, PInputLine(Control), 11)));
 
       R.Assign(3, 8, 37, 12);
       Control := New(Dialogs.PCheckBoxes, Init(R,
-        NewSItem('~G~ross- und Kleinschreibung',
-        NewSItem('~N~ur ganze W'#148'rter',
-        NewSItem('~R~egul'#132're Ausdr'#129'cke',
-        NewSItem('~A~lle ersetzen', nil))))));
+        NewSItem('~C~ase sensitive',
+        NewSItem('~W~hole words only',
+        NewSItem('~R~egular expressions',
+        NewSItem('~A~ll occurrences', nil))))));
       Control^.HelpCtx := hcCCaseSensitive;
       Insert(Control);
 
@@ -137,7 +137,7 @@ New replace dialog, I took this from the FPC sources and translated it to German
       Insert(Control);
 
       R.Assign(22, 13, 32, 15);
-      Control := New(PButton, Init(R, 'Ab~b~ruch', cmCancel, bfNormal));
+      Control := New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal));
       Control^.HelpCtx := hcDCancel;
       Insert(Control);
 
@@ -206,30 +206,30 @@ This is the only thing you have to do.
     R.B.Y := R.A.Y + 1;
 
     MenuBar := New(PMenuBar, Init(R, NewMenu(
-      NewSubMenu('~D~atei', hcNoContext, NewMenu(
-        NewItem('~N~eu', 'F4', kbF4, cmNewWin, hcNoContext,
-        NewItem('~O~effnen...', 'F3', kbF3, cmOpen, hcNoContext,
-        NewItem('~S~peichern', 'F2', kbF2, cmSave, hcNoContext,
-        NewItem('Speichern ~u~nter...', '', kbNoKey, cmSaveAs, hcNoContext,
-        NewItem('~A~lle speichern', '', kbNoKey, cmSaveAll, hcNoContext,
+      NewSubMenu('~F~ile', hcNoContext, NewMenu(
+        NewItem('~N~ew', 'F4', kbF4, cmNewWin, hcNoContext,
+        NewItem('~O~pen...', 'F3', kbF3, cmOpen, hcNoContext,
+        NewItem('~S~ave', 'F2', kbF2, cmSave, hcNoContext,
+        NewItem('Save ~a~s...', '', kbNoKey, cmSaveAs, hcNoContext,
+        NewItem('Save ~A~ll', '', kbNoKey, cmSaveAll, hcNoContext,
         NewLine(
-        NewItem('~B~eenden', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
-      NewSubMenu('~S~uchen', hcNoContext, NewMenu(
-        NewItem('~S~uchen...', 'Ctrl+F', kbCtrlF, cmFind, hcNoContext,
-        NewItem('~E~rsetzten...', 'Ctrl+H', kbCtrlH, cmReplace, hcNoContext,
-        NewItem('Suche ~n~'#132'chstes', 'Ctrl+N', kbCtrlN, cmSearchAgain, hcNoContext, nil)))),
-      NewSubMenu('~F~enster', hcNoContext, NewMenu(
-        NewItem('~N~ebeneinander', '', kbNoKey, cmTile, hcNoContext,
-        NewItem(#154'ber~l~append', '', kbNoKey, cmCascade, hcNoContext,
-        NewItem('~A~lle schliessen', '', kbNoKey, cmCloseAll, hcNoContext,
-        NewItem('Anzeige ~e~rneuern', '', kbNoKey, cmRefresh, hcNoContext,
+        NewItem('E~x~it', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
+      NewSubMenu('~S~earch', hcNoContext, NewMenu(
+        NewItem('~F~ind...', 'Ctrl+F', kbCtrlF, cmFind, hcNoContext,
+        NewItem('~R~eplace...', 'Ctrl+H', kbCtrlH, cmReplace, hcNoContext,
+        NewItem('Find ~N~ext', 'Ctrl+N', kbCtrlN, cmSearchAgain, hcNoContext, nil)))),
+      NewSubMenu('~W~indow', hcNoContext, NewMenu(
+        NewItem('~T~ile', '', kbNoKey, cmTile, hcNoContext,
+        NewItem('~C~ascade', '', kbNoKey, cmCascade, hcNoContext,
+        NewItem('~C~lose All', '', kbNoKey, cmCloseAll, hcNoContext,
+        NewItem('~R~efresh', '', kbNoKey, cmRefresh, hcNoContext,
         NewLine(
-        NewItem('Gr'#148'sse/~P~osition', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
-        NewItem('Ver~g~'#148'ssern', 'F5', kbF5, cmZoom, hcNoContext,
-        NewItem('~N~'#132'chstes', 'F6', kbF6, cmNext, hcNoContext,
-        NewItem('~V~orheriges', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
+        NewItem('~S~ize/~P~osition', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
+        NewItem('~Z~oom', 'F5', kbF5, cmZoom, hcNoContext,
+        NewItem('~N~ext', 'F6', kbF6, cmNext, hcNoContext,
+        NewItem('~P~revious', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
         NewLine(
-        NewItem('~S~chliessen', 'Alt+F3', kbAltF3, cmClose, hcNoContext, nil)))))))))))), nil))))));
+        NewItem('~C~lose', 'Alt+F3', kbAltF3, cmClose, hcNoContext, nil)))))))))))), nil))))));
   end;
   //code-
 
@@ -262,7 +262,7 @@ This is the only thing you have to do.
     FileName: ShortString;
   begin
     FileName := '*.*';
-    New(FileDialog, Init(FileName, 'Datei '#148'ffnen', '~D~ateiname', fdOpenButton, 1));
+    New(FileDialog, Init(FileName, 'Open file', '~F~ilename', fdOpenButton, 1));
     if ExecuteDialog(FileDialog, @FileName) <> cmCancel then begin
       NewWindows(FileName); // New window with selected file.
     end;

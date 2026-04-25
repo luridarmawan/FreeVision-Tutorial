@@ -1,11 +1,13 @@
 //image image.png
 (*
-Hier wurde ein Zwischenablage hinzugefügt, somit ist auch kopieren und einfügen im Editor möglich.
-Die Zwischeablage ist nicht anderes als ein Editor-Fenster welches die Daten bekommt, wen man kopieren wählt.
-Somit kann man dieses sogar sichbar machen.
+A clipboard has been added here, making copy and paste possible in the editor.
+The clipboard is nothing more than an editor window that receives the data when you choose to copy.
+This means it can even be made visible.
 *)
 //lineal
 program Project1;
+
+{$mode objfpc}
 
 uses
   App,
@@ -20,7 +22,7 @@ uses
   FVConsts;
 
 (*
-Ein Kommando für das öffnen des Zwischenablagefenster.
+A command for opening the clipboard window.
 *)
 //code+
 const
@@ -30,8 +32,8 @@ const
 //code-
 
 (*
-Hier wird das Fenster für die Zwischenablage deklariert.
-Auch kann man bei <b>NewWindows</b> sagen, ob das Fenster nicht sichtbar ezeigt werden soll.
+Here the window for the clipboard is declared.
+Also, in <b>NewWindows</b> you can specify whether the window should not be displayed visibly.
 *)
 //code+
 type
@@ -46,7 +48,7 @@ type
     procedure HandleEvent(var Event: TEvent); virtual;
     procedure OutOfMemory; virtual;
 
-    function NewWindows(FileName: ShortString; Visible: Boolean = False): PEditWindow;
+    function NewWindows(FileName: ShortString; Visible: Boolean): PEditWindow;
     procedure OpenWindows;
     procedure SaveAll;
     procedure CloseAll;
@@ -63,7 +65,7 @@ var
     R: TRect;
   begin
     R.Assign(0, 0, 38, 12);
-    D := New(PDialog, Init(R, 'Suchen'));
+    D := New(PDialog, Init(R, 'Find'));
     with D^ do begin
       Options := Options or ofCentered;
 
@@ -72,14 +74,14 @@ var
       Control^.HelpCtx := hcDFindText;
       Insert(Control);
       R.Assign(2, 2, 20, 3);
-      Insert(New(PLabel, Init(R, 'Zu ~s~uchenden Text', Control)));
+      Insert(New(PLabel, Init(R, '~S~earch Text', Control)));
       R.Assign(32, 3, 35, 4);
       Insert(New(PHistory, Init(R, PInputLine(Control), 10)));
 
       R.Assign(3, 5, 35, 7);
       Control := New(PCheckBoxes, Init(R,
-        NewSItem('~G~ross- und Kleinschreibung',
-        NewSItem('~N~ur ganze W'#148'rter', nil))));
+        NewSItem('~C~ase Sensitive',
+        NewSItem('~W~hole Words Only', nil))));
       Control^.HelpCtx := hcCCaseSensitive;
       Insert(Control);
 
@@ -106,7 +108,7 @@ var
     R: TRect;
   begin
     R.Assign(0, 0, 40, 16);
-    Dialog := New(PDialog, Init(R, 'Ersetzen'));
+    Dialog := New(PDialog, Init(R, 'Replace'));
     with Dialog^ do begin
       Options := Options or ofCentered;
 
@@ -115,7 +117,7 @@ var
       Control^.HelpCtx := hcDFindText;
       Insert(Control);
       R.Assign(2, 2, 20, 3);
-      Insert(New(PLabel, Init(R, 'Zu ~s~uchenden Text', Control)));
+      Insert(New(PLabel, Init(R, '~S~earch Text', Control)));
       R.Assign(34, 3, 37, 4);
       Insert(New(PHistory, Init(R, PInputLine(Control), 10)));
 
@@ -124,16 +126,16 @@ var
       Control^.HelpCtx := hcDReplaceText;
       Insert(Control);
       R.Assign(2, 5, 20, 6);
-      Insert(New(PLabel, Init(R, 'Neuer ~T~ext', Control)));
+      Insert(New(PLabel, Init(R, 'New ~T~ext', Control)));
       R.Assign(34, 6, 37, 7);
       Insert(New(PHistory, Init(R, PInputLine(Control), 11)));
 
       R.Assign(3, 8, 37, 12);
       Control := New(Dialogs.PCheckBoxes, Init(R,
-        NewSItem('~G~ross- und Kleinschreibung',
-        NewSItem('~N~ur ganze W'#148'rter',
-        NewSItem('~R~egul'#132're Ausdr'#129'cke',
-        NewSItem('~A~lle ersetzen', nil))))));
+        NewSItem('~C~ase Sensitive',
+        NewSItem('~W~hole Words Only',
+        NewSItem('~R~egular Expressions',
+        NewSItem('~R~eplace All', nil))))));
       Control^.HelpCtx := hcCCaseSensitive;
       Insert(Control);
 
@@ -143,7 +145,7 @@ var
       Insert(Control);
 
       R.Assign(22, 13, 32, 15);
-      Control := New(PButton, Init(R, 'Ab~b~ruch', cmCancel, bfNormal));
+      Control := New(PButton, Init(R, 'Ca~n~cel', cmCancel, bfNormal));
       Control^.HelpCtx := hcDCancel;
       Insert(Control);
 
@@ -155,28 +157,28 @@ var
   function MyStdEditorDialog(Dialog: Int16; Info: Pointer): word;
   begin
     case Dialog of
-      edSaveAs: begin                           // Neuer Dialog in Deutsch.
+      edSaveAs: begin                           // New dialog in English.
         Result := MyApp.ExecuteDialog(New(PFileDialog, Init('*.txt',
-          'Datei speichern unter', '~D~atei-Name', fdOkButton, 101)), Info);
+          'Save File As', '~F~ile Name', fdOkButton, 101)), Info);
       end;
-      edFind: begin                             // Der kommplet neue Suchen-Dialog.
+      edFind: begin                             // The completely new Find dialog.
         Result := Application^.ExecuteDialog(DECreateFindDialog, Info);
       end;
-      edReplace: begin                          // Der kommplet neue Ersetzen-Dialog.
+      edReplace: begin                          // The completely new Replace dialog.
         Result := MyApp.ExecuteDialog(DECreateReplaceDialog, Info);
       end;
       else begin
         Result := StdEditorDialog(Dialog, Info);
-      end;                                      // Original Dialoge aufrufen.
+      end;                                      // Call original dialogs.
     end;
   end;
 
   constructor TMyApp.Init;
   begin
     inherited Init;
-    EditorDialog := @MyStdEditorDialog; // Die neue Dialog-Routine.
+    EditorDialog := @MyStdEditorDialog; // The new dialog routine.
     DisableCommands([cmSave, cmSaveAs, cmCut, cmCopy, cmPaste, cmClear, cmUndo]);
-    NewWindows('');                     // Leeres Fenster erzeugen.
+    NewWindows('', False);              // Create empty window.
 
     ClipWindow := NewWindows('', True);
     if ClipWindow <> nil then begin
@@ -193,14 +195,14 @@ var
     R.A.Y := R.B.Y - 1;
 
     StatusLine := New(PStatusLine, Init(R, NewStatusDef(0, $FFFF,
-      NewStatusKey('~Alt+X~ Programm beenden', kbAltX, cmQuit,
+      NewStatusKey('~Alt+X~ Exit', kbAltX, cmQuit,
       NewStatusKey('~F10~ Menu', kbF10, cmMenu,
-      NewStatusKey('~F2~ Speichern', kbF2, cmMenu,
-      NewStatusKey('~F1~ Hilfe', kbF1, cmHelp, nil)))), nil)));
+      NewStatusKey('~F2~ Save', kbF2, cmMenu,
+      NewStatusKey('~F1~ Help', kbF1, cmHelp, nil)))), nil)));
   end;
 
 (*
-Im Menü sind die neuen Bearbeiten-Funktionen dazugekommen.
+New Edit functions have been added to the menu.
 *)
   //code+
   procedure TMyApp.InitMenuBar;
@@ -211,52 +213,52 @@ Im Menü sind die neuen Bearbeiten-Funktionen dazugekommen.
     R.B.Y := R.A.Y + 1;
 
     MenuBar := New(PMenuBar, Init(R, NewMenu(
-      NewSubMenu('~D~atei', hcNoContext, NewMenu(
-        NewItem('~N~eu', 'F4', kbF4, cmNewWin, hcNoContext,
-        NewItem('~O~effnen...', 'F3', kbF3, cmOpen, hcNoContext,
-        NewItem('~S~peichern', 'F2', kbF2, cmSave, hcNoContext,
-        NewItem('Speichern ~u~nter...', '', kbNoKey, cmSaveAs, hcNoContext,
-        NewItem('~A~lle speichern', '', kbNoKey, cmSaveAll, hcNoContext,
+      NewSubMenu('~F~ile', hcNoContext, NewMenu(
+        NewItem('~N~ew', 'F4', kbF4, cmNewWin, hcNoContext,
+        NewItem('~O~pen...', 'F3', kbF3, cmOpen, hcNoContext,
+        NewItem('~S~ave', 'F2', kbF2, cmSave, hcNoContext,
+        NewItem('Save ~A~s...', '', kbNoKey, cmSaveAs, hcNoContext,
+        NewItem('Save ~A~ll', '', kbNoKey, cmSaveAll, hcNoContext,
         NewLine(
-        NewItem('~B~eenden', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
-      NewSubMenu('~B~earbeiten', hcNoContext, NewMenu(
-        NewItem('~R~'#129'ckg'#132'ngig', '', kbAltBack, cmUndo, hcUndo,
+        NewItem('~E~xit', 'Alt-X', kbAltX, cmQuit, hcNoContext, nil)))))))),
+      NewSubMenu('~E~dit', hcNoContext, NewMenu(
+        NewItem('~U~ndo', '', kbAltBack, cmUndo, hcUndo,
         NewLine(
-        NewItem('Aus~s~chneiden', 'Shift+Del', kbShiftDel, cmCut, hcCut,
-        NewItem('~K~opieren', 'Ctrl+Ins', kbCtrlIns, cmCopy, hcCopy,
-        NewItem('~E~inf'#129'gen', 'Shift+Ins', kbShiftIns, cmPaste, hcPaste,
-        NewItem('~L~'#148'schen', 'Ctrl+Del', kbCtrlDel, cmClear, hcClear,
+        NewItem('Cu~t~', 'Shift+Del', kbShiftDel, cmCut, hcCut,
+        NewItem('~C~opy', 'Ctrl+Ins', kbCtrlIns, cmCopy, hcCopy,
+        NewItem('~P~aste', 'Shift+Ins', kbShiftIns, cmPaste, hcPaste,
+        NewItem('~D~elete', 'Ctrl+Del', kbCtrlDel, cmClear, hcClear,
         NewLine(
-        NewItem('~Z~wischenablage', '', kbNoKey, cmShowClip, hcCut, nil))))))))),
-      NewSubMenu('~S~uchen', hcNoContext, NewMenu(
-        NewItem('~S~uchen...', 'Ctrl+F', kbCtrlF, cmFind, hcNoContext,
-        NewItem('~E~rsetzten...', 'Ctrl+H', kbCtrlH, cmReplace, hcNoContext,
-        NewItem('Suche ~n~'#132'chstes', 'Ctrl+N', kbCtrlN, cmSearchAgain, hcNoContext, nil)))),
-      NewSubMenu('~F~enster', hcNoContext, NewMenu(
-        NewItem('~N~ebeneinander', '', kbNoKey, cmTile, hcNoContext,
-        NewItem(#154'ber~l~append', '', kbNoKey, cmCascade, hcNoContext,
-        NewItem('~A~lle schliessen', '', kbNoKey, cmCloseAll, hcNoContext,
-        NewItem('Anzeige ~e~rneuern', '', kbNoKey, cmRefresh, hcNoContext,
+        NewItem('~C~lipboard', '', kbNoKey, cmShowClip, hcCut, nil))))))))),
+      NewSubMenu('~S~earch', hcNoContext, NewMenu(
+        NewItem('~F~ind...', 'Ctrl+F', kbCtrlF, cmFind, hcNoContext,
+        NewItem('~R~eplace...', 'Ctrl+H', kbCtrlH, cmReplace, hcNoContext,
+        NewItem('Find ~N~ext', 'Ctrl+N', kbCtrlN, cmSearchAgain, hcNoContext, nil)))),
+      NewSubMenu('~W~indow', hcNoContext, NewMenu(
+        NewItem('~T~ile', '', kbNoKey, cmTile, hcNoContext,
+        NewItem('~C~ascade', '', kbNoKey, cmCascade, hcNoContext,
+        NewItem('Close ~A~ll', '', kbNoKey, cmCloseAll, hcNoContext,
+        NewItem('~R~efresh', '', kbNoKey, cmRefresh, hcNoContext,
         NewLine(
-        NewItem('Gr'#148'sse/~P~osition', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
-        NewItem('Ver~g~'#148'ssern', 'F5', kbF5, cmZoom, hcNoContext,
-        NewItem('~N~'#132'chstes', 'F6', kbF6, cmNext, hcNoContext,
-        NewItem('~V~orheriges', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
+        NewItem('~S~ize/Move', 'Ctrl+F5', kbCtrlF5, cmResize, hcNoContext,
+        NewItem('~Z~oom', 'F5', kbF5, cmZoom, hcNoContext,
+        NewItem('~N~ext', 'F6', kbF6, cmNext, hcNoContext,
+        NewItem('~P~revious', 'Shift+F6', kbShiftF6, cmPrev, hcNoContext,
         NewLine(
-        NewItem('~S~chliessen', 'Alt+F3', kbAltF3, cmClose, hcNoContext, nil)))))))))))), nil)))))));
+        NewItem('~C~lose', 'Alt+F3', kbAltF3, cmClose, hcNoContext, nil)))))))))))), nil)))))));
   end;
   //code-
 
   procedure TMyApp.OutOfMemory;
   begin
-    MessageBox('Zu wenig Arbeitsspeicher !', nil, mfError + mfOkButton);
+    MessageBox('Not enough memory!', nil, mfError + mfOkButton);
   end;
 
 (*
-Hier sieht man, wie man ein Fenster unsichbar erzeugen kann.
+Here you can see how to create a hidden window.
 *)
 //code+
-  function TMyApp.NewWindows(FileName: ShortString; Visible: Boolean = False) : PEditWindow;
+  function TMyApp.NewWindows(FileName: ShortString; Visible: Boolean) : PEditWindow;
   var
     Win: PEditWindow;
     R: TRect;
@@ -268,7 +270,7 @@ Hier sieht man, wie man ein Fenster unsichbar erzeugen kann.
     Win := New(PEditWindow, Init(R, FileName, WinCounter));
     if ValidView(Win) <> nil then begin
       if Visible then begin
-        win^.Hide;        // Fenster verstecken.
+        win^.Hide;        // Hide window.
       end;
       Result := PEditWindow(MyApp.InsertWindow(win));
     end else begin
@@ -283,11 +285,12 @@ Hier sieht man, wie man ein Fenster unsichbar erzeugen kann.
     FileName: ShortString;
   begin
     FileName := '*.*';
-    New(FileDialog, Init(FileName, 'Datei '#148'ffnen', '~D~ateiname', fdOpenButton, 1));
+    New(FileDialog, Init(FileName, 'Open File', '~F~ilename', fdOpenButton, 1));
     if ExecuteDialog(FileDialog, @FileName) <> cmCancel then begin
-      NewWindows(FileName);
+      NewWindows(FileName, False);
     end;
   end;
+
   procedure TMyApp.SaveAll;
 
     procedure SendSave(P: PView);
@@ -311,7 +314,7 @@ Hier sieht man, wie man ein Fenster unsichbar erzeugen kann.
   end;
 
 (*
-Hier sieht man, wie man das verborgene Zwischenablagefenster sichbar macht.
+Here you can see how to make the hidden clipboard window visible.
 *)
 //code+
   procedure TMyApp.HandleEvent(var Event: TEvent);
@@ -321,7 +324,7 @@ Hier sieht man, wie man das verborgene Zwischenablagefenster sichbar macht.
     if Event.What = evCommand then begin
       case Event.Command of
         cmNewWin: begin
-          NewWindows('');
+          NewWindows('', False);
         end;
         cmOpen: begin
           OpenWindows;
@@ -335,7 +338,7 @@ Hier sieht man, wie man das verborgene Zwischenablagefenster sichbar macht.
         cmRefresh: begin
           ReDraw;
         end;
-        cmShowClip: begin     // Clipboard anzeigen.
+        cmShowClip: begin     // Show clipboard.
           ClipWindow^.Select;
           ClipWindow^.Show;
         end;
@@ -348,7 +351,7 @@ Hier sieht man, wie man das verborgene Zwischenablagefenster sichbar macht.
 //code-
 
 begin
-  MyApp.Init;   // Inizialisieren
-  MyApp.Run;    // Abarbeiten
-  MyApp.Done;   // Freigeben
+  MyApp.Init;   // Initialize
+  MyApp.Run;    // Run
+  MyApp.Done;   // Free resources
 end.

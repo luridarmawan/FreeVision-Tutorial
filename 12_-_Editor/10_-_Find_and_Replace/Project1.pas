@@ -1,10 +1,10 @@
 //image image.png
 (*
-Der Editor hat eine <b>Suchen</b> und <b>Ersetzen</b> Funktion bekommen.
-Leider sind die Standard-Dialoge dafür in Englisch.
-Aus diesem Grund, wird es hier neu in deutsch gebaut.
-Da man leider nicht einfach die Texte ersetzen kann, so wie es bei dem FileDialog der Fall ist.
-Gibt man sich mit den englischen Dialogen zu frieden, muss man für die Suchen/Ersetzen-Funktionen nur das Menü anpassen, der Rest geschieht automatisch.
+The editor now has a <b>Find</b> and <b>Replace</b> function.
+Unfortunately the standard dialogs are in English.
+For this reason, a new one is built here in German.
+Since unfortunately you cannot simply replace the texts, as is the case with the FileDialog.
+If you are satisfied with the English dialogs, you only need to adjust the menu for the search/replace functions, the rest happens automatically.
 *)
 //lineal
 program Project1;
@@ -44,10 +44,11 @@ var
   MyApp: TMyApp;
 
 (*
-Neuer ersetzen Dialog, dieser habe ich von den FPC-Sourcen übernommen und verdeutscht.
+New replace dialog, I took this from the FPC sources and translated it to German.
 *)
+
   //code+
-  // === Suchen Dialog
+  // === Find Dialog
   function DECreateFindDialog: PDialog;
   var
     D: PDialog;
@@ -91,7 +92,7 @@ Neuer ersetzen Dialog, dieser habe ich von den FPC-Sourcen übernommen und verde
     Result := D;
   end;
 
-  // === Ersetzen Dialog
+  // === Replace Dialog
   function DECreateReplaceDialog: PDialog;
   var
     Dialog: PDialog;
@@ -147,25 +148,25 @@ Neuer ersetzen Dialog, dieser habe ich von den FPC-Sourcen übernommen und verde
   //code-
 
 (*
-Hier wird die neuen Dialoge eingefügt.
+Here the new dialogs are inserted.
 *)
   //code+
   function MyStdEditorDialog(Dialog: Int16; Info: Pointer): word;
   begin
     case Dialog of
-      edSaveAs: begin                           // Neuer Dialog in Deutsch.
+      edSaveAs: begin                           // New dialog in German.
         Result := MyApp.ExecuteDialog(New(PFileDialog, Init('*.txt',
-          'Datei speichern unter', '~D~atei-Name', fdOkButton, 101)), Info);
+          'Save file as', '~D~atei-Name', fdOkButton, 101)), Info);
       end;
-      edFind:                                   // Der kommplet neue Suchen-Dialog.
+      edFind:                                   // The completely new Find dialog.
         Result := Application^.ExecuteDialog(DECreateFindDialog, Info);
-      edReplace:                                // Der kommplet neue Ersetzen-Dialog.
+      edReplace:                                // The completely new Replace dialog.
       begin
         Result := MyApp.ExecuteDialog(DECreateReplaceDialog, Info);
       end;
       else begin
         Result := StdEditorDialog(Dialog, Info);
-      end;                                      // Original Dialoge aufrufen.
+      end;                                      // Call original dialogs.
     end;
   end;
   //code-
@@ -173,9 +174,9 @@ Hier wird die neuen Dialoge eingefügt.
   constructor TMyApp.Init;
   begin
     inherited Init;
-    EditorDialog := @MyStdEditorDialog; // Die neue Dialog-Routine.
+    EditorDialog := @MyStdEditorDialog; // The new dialog routine.
     DisableCommands([cmSave, cmSaveAs, cmCut, cmCopy, cmPaste, cmClear, cmUndo]);
-    NewWindows('');                     // Leeres Fenster erzeugen.
+    NewWindows('');                     // Create empty window.
   end;
 
   procedure TMyApp.InitStatusLine;
@@ -186,15 +187,15 @@ Hier wird die neuen Dialoge eingefügt.
     R.A.Y := R.B.Y - 1;
 
     StatusLine := New(PStatusLine, Init(R, NewStatusDef(0, $FFFF,
-      NewStatusKey('~Alt+X~ Programm beenden', kbAltX, cmQuit,
+      NewStatusKey('~Alt+X~ Exit', kbAltX, cmQuit,
       NewStatusKey('~F10~ Menu', kbF10, cmMenu,
-      NewStatusKey('~F2~ Speichern', kbF2, cmMenu,
-      NewStatusKey('~F1~ Hilfe', kbF1, cmHelp, nil)))), nil)));
+      NewStatusKey('~F2~ Save', kbF2, cmMenu,
+      NewStatusKey('~F1~ Help', kbF1, cmHelp, nil)))), nil)));
   end;
 
 (*
-Im Menü sind die neuen Suchen-Funktionen dazugekommen.
-Dies ist das einzige was man machen muss.
+In the menu the new search functions have been added.
+This is the only thing you have to do.
 *)
   //code+
   procedure TMyApp.InitMenuBar;
@@ -234,7 +235,7 @@ Dies ist das einzige was man machen muss.
 
   procedure TMyApp.OutOfMemory;
   begin
-    MessageBox('Zu wenig Arbeitsspeicher !', nil, mfError + mfOkButton);
+    MessageBox('Not enough memory!', nil, mfError + mfOkButton);
   end;
 
   procedure TMyApp.NewWindows(FileName: ShortString);
@@ -242,7 +243,7 @@ Dies ist das einzige was man machen muss.
     Win: PEditWindow;
     R: TRect;
   const
-    WinCounter: integer = 0;      // Zählt Fenster
+    WinCounter: integer = 0;      // Window counter
   begin
     R.Assign(0, 0, 60, 20);
     Inc(WinCounter);
@@ -250,7 +251,7 @@ Dies ist das einzige was man machen muss.
 
     if ValidView(Win) <> nil then begin
       Desktop^.Insert(Win);
-    end else begin                // Fügt das Fenster ein.
+    end else begin                // Insert the window.
       Dec(WinCounter);
     end;
   end;
@@ -263,18 +264,18 @@ Dies ist das einzige was man machen muss.
     FileName := '*.*';
     New(FileDialog, Init(FileName, 'Datei '#148'ffnen', '~D~ateiname', fdOpenButton, 1));
     if ExecuteDialog(FileDialog, @FileName) <> cmCancel then begin
-      NewWindows(FileName); // Neues Fenster mit der ausgewählten Datei.
+      NewWindows(FileName); // New window with selected file.
     end;
   end;
   procedure TMyApp.SaveAll;
 
     procedure SendSave(P: PView);
     begin
-      Message(P, evCommand, cmSave, nil); // Das Kommando speicherm mitgeben.
+      Message(P, evCommand, cmSave, nil); // Send save command.
     end;
 
   begin
-    Desktop^.ForEach(@SendSave);          // Auf alle Fenster anwenden.
+    Desktop^.ForEach(@SendSave);          // Apply to all windows.
   end;
 
   procedure TMyApp.CloseAll;
@@ -295,19 +296,19 @@ Dies ist das einzige was man machen muss.
     if Event.What = evCommand then begin
       case Event.Command of
         cmNewWin: begin
-          NewWindows('');   // Leeres Fenster erzeugen.
+          NewWindows('');   // Create empty window.
         end;
         cmOpen: begin
-          OpenWindows;      // Datei öffnen.
+          OpenWindows;      // Open file.
         end;
         cmSaveAll: begin
-          SaveAll;          // Alle speichern.
+          SaveAll;          // Save all.
         end;
         cmCloseAll: begin
-          CloseAll;         // Schliesst alle Fenster.
+          CloseAll;         // Close all windows.
         end;
         cmRefresh: begin
-          ReDraw;           // Anwendung neu zeichnen.
+          ReDraw;           // Redraw application.
         end;
         else begin
           Exit;
@@ -317,7 +318,7 @@ Dies ist das einzige was man machen muss.
   end;
 
 begin
-  MyApp.Init;   // Inizialisieren
-  MyApp.Run;    // Abarbeiten
-  MyApp.Done;   // Freigeben
+  MyApp.Init;   // Initialize
+  MyApp.Run;    // Run
+  MyApp.Done;   // Release
 end.

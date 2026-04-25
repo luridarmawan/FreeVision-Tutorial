@@ -149,7 +149,7 @@ Die Idle Routine, welche im Leerlauf den Heap prüft und anzeigt.
 
     function IsTileable(P: PView): Boolean;
     begin
-      Result := (P^.Options and ofTileable <> 0) and (P^.State and sfVisible <> 0);
+      IsTileable := (P^.Options and ofTileable <> 0) and (P^.State and sfVisible <> 0);
     end;
 
   begin
